@@ -8,16 +8,16 @@
   Displays the numbers 0-9 on the display, with one second inbetween.
     A
    ---
-F |   | B
+  F |   | B
   | G |
    ---
-E |   | C
+  E |   | C
   |   |
    ---
     D
   This example code is in the public domain.
- */
- 
+*/
+
 // Pin 2-8 is connected to the 7 segments of the display.
 
 int pinA = 2;
@@ -37,157 +37,138 @@ const int RECV_PIN = 13;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 
-
 // the setup routine runs once when you press reset:
-void setup() {            
-
-
+void setup() {
+  
   Serial.begin(9600);
   irrecv.enableIRIn();
   irrecv.blink13(true);
 
-  
   // initialize the digital pins as outputs.
-  pinMode(pinA, OUTPUT);     
-  pinMode(pinB, OUTPUT);     
-  pinMode(pinC, OUTPUT);     
-  pinMode(pinD, OUTPUT);     
-  pinMode(pinE, OUTPUT);     
-  pinMode(pinF, OUTPUT);     
-  pinMode(pinG, OUTPUT);   
-  pinMode(D1, OUTPUT);  
-  pinMode(D2, OUTPUT);  
-  pinMode(D3, OUTPUT);  
-  pinMode(D4, OUTPUT);  
+  pinMode(pinA, OUTPUT);
+  pinMode(pinB, OUTPUT);
+  pinMode(pinC, OUTPUT);
+  pinMode(pinD, OUTPUT);
+  pinMode(pinE, OUTPUT);
+  pinMode(pinF, OUTPUT);
+  pinMode(pinG, OUTPUT);
+  pinMode(D1, OUTPUT);
+  pinMode(D2, OUTPUT);
+  pinMode(D3, OUTPUT);
+  pinMode(D4, OUTPUT);
+}
+
+// Takes in which the seg to 
+void set_digit(int segment, int digit) {
+  //Initialize
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, HIGH);
+
+  //Initialize
+  digitalWrite(pinA, LOW);
+  digitalWrite(pinB, LOW);
+  digitalWrite(pinC, LOW);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, LOW);
+  digitalWrite(pinF, LOW);
+  digitalWrite(pinG, LOW);
+  
+  if (segment == 1) {
+    digitalWrite(D1, LOW);
+  }
+  else if (segment == 2) {
+    digitalWrite(D2, LOW);
+  }
+  else if (segment == 3) {
+    digitalWrite(D3, LOW);
+  }
+  else if (segment == 4) {
+    digitalWrite(D4, LOW);
+  }
+
+  if (digit == 0) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+  }
+  else if (digit == 1) {
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+  }
+  else if (digit == 2) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (digit == 3) {
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (digit == 4) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (digit == 5) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (digit == 6) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (digit == 7) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinF, HIGH);
+  }
+  else if (digit == 8) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (digit == 9) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  delay(1);
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
 
-  if (irrecv.decode(&results)){
-        Serial.println(results.value, HEX);
-        irrecv.resume();
+  if (irrecv.decode(&results)) {
+    Serial.println(results.value, HEX);
+    irrecv.resume();
   }
-
   
-  // DIGIT 1
-  digitalWrite(D1, LOW);
-  digitalWrite(D2, HIGH);
-  digitalWrite(D3, HIGH);
-  digitalWrite(D4, HIGH); 
-
-  digitalWrite(pinA, HIGH);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, HIGH);   
-  digitalWrite(pinD, HIGH);   
-  digitalWrite(pinE, HIGH);   
-  digitalWrite(pinF, HIGH);   
-  digitalWrite(pinG, LOW);   
-  delay(1);               // wait for a second
-
-  // DIGIT 2
-  digitalWrite(D1, HIGH);
-  digitalWrite(D2, LOW);
-  digitalWrite(D3, HIGH);
-  digitalWrite(D4, HIGH); 
-  
-  digitalWrite(pinA, LOW);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, HIGH);   
-  digitalWrite(pinD, LOW);   
-  digitalWrite(pinE, LOW);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, LOW);   
-  delay(1);               // wait for a second
-
-  // DIGIT 3
-  digitalWrite(D1, HIGH);
-  digitalWrite(D2, HIGH);
-  digitalWrite(D3, LOW);
-  digitalWrite(D4, HIGH); 
- 
-  digitalWrite(pinA, HIGH);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, LOW);   
-  digitalWrite(pinD, HIGH);   
-  digitalWrite(pinE, HIGH);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, HIGH);     
-  delay(1);               // wait for a second
-
-  // DIGIT 4
-  digitalWrite(D1, HIGH);
-  digitalWrite(D2, HIGH);
-  digitalWrite(D3, HIGH);
-  digitalWrite(D4, LOW); 
-  //3
-  digitalWrite(pinA, HIGH);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, HIGH);   
-  digitalWrite(pinD, HIGH);   
-  digitalWrite(pinE, LOW);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, HIGH);     
-  delay(1);               // wait for a second
-/*  
-  //4
-  digitalWrite(pinA, HIGH);   
-  digitalWrite(pinB, LOW);   
-  digitalWrite(pinC, LOW);   
-  digitalWrite(pinD, HIGH);   
-  digitalWrite(pinE, HIGH);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, LOW);     
-  delay(1000);               // wait for a second
-  
-  //5
-  digitalWrite(pinA, LOW);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, LOW);   
-  digitalWrite(pinD, LOW);   
-  digitalWrite(pinE, HIGH);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, LOW);     
-  delay(1000);               // wait for a second
-  
-  //6
-  digitalWrite(pinA, LOW);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, LOW);   
-  digitalWrite(pinD, LOW);   
-  digitalWrite(pinE, LOW);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, LOW);     
-  delay(1000);               // wait for a second
-  
-  //7
-  digitalWrite(pinA, LOW);   
-  digitalWrite(pinB, LOW);   
-  digitalWrite(pinC, LOW);   
-  digitalWrite(pinD, HIGH);   
-  digitalWrite(pinE, HIGH);   
-  digitalWrite(pinF, HIGH);   
-  digitalWrite(pinG, HIGH);     
-  delay(1000);               // wait for a second
-  
-  //8
-  digitalWrite(pinA, LOW);   
-  digitalWrite(pinB, LOW);   
-  digitalWrite(pinC, LOW);   
-  digitalWrite(pinD, LOW);   
-  digitalWrite(pinE, LOW);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, LOW);     
-  delay(1000);               // wait for a second
-
-  //9
-  digitalWrite(pinA, LOW);   
-  digitalWrite(pinB, LOW);   
-  digitalWrite(pinC, LOW);   
-  digitalWrite(pinD, HIGH);   
-  digitalWrite(pinE, HIGH);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, LOW);     
-  delay(1000);               // wait for a second
-  */
+  set_digit(1, 6);
+  set_digit(3, 0);
 }
