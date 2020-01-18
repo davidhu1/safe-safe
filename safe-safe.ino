@@ -36,8 +36,18 @@ const int Y_pin = 1;
 const int low_threshold = 400;
 const int high_threshold = 600;
 
+bool centered = true;
+
 // PIN
-int = 0;
+int pin = 0;
+
+// 7 Segs
+int value1 = 0;
+int value2 = 0;
+int value3 = 0;
+int value4 = 0;
+
+int current_position = 1;
 
 // the setup routine runs once when you press reset:
 void setup() {
@@ -62,7 +72,7 @@ void setup() {
 }
 
 // Takes in which the seg to 
-void set_digit(int segment, int digit) {
+void set_digit(int position, int value) {
   //Initialize
   digitalWrite(D1, HIGH);
   digitalWrite(D2, HIGH);
@@ -78,20 +88,20 @@ void set_digit(int segment, int digit) {
   digitalWrite(pinF, LOW);
   digitalWrite(pinG, LOW);
   
-  if (segment == 1) {
+  if (position == 1) {
     digitalWrite(D1, LOW);
   }
-  else if (segment == 2) {
+  else if (position == 2) {
     digitalWrite(D2, LOW);
   }
-  else if (segment == 3) {
+  else if (position == 3) {
     digitalWrite(D3, LOW);
   }
-  else if (segment == 4) {
+  else if (position == 4) {
     digitalWrite(D4, LOW);
   }
 
-  if (digit == 0) {
+  if (value == 0) {
     digitalWrite(pinA, HIGH);
     digitalWrite(pinB, HIGH);
     digitalWrite(pinC, HIGH);
@@ -99,38 +109,38 @@ void set_digit(int segment, int digit) {
     digitalWrite(pinE, HIGH);
     digitalWrite(pinF, HIGH);
   }
-  else if (digit == 1) {
+  else if (value == 1) {
     digitalWrite(pinB, HIGH);
     digitalWrite(pinC, HIGH);
   }
-  else if (digit == 2) {
+  else if (value == 2) {
     digitalWrite(pinA, HIGH);
     digitalWrite(pinB, HIGH);
     digitalWrite(pinD, HIGH);
     digitalWrite(pinE, HIGH);
     digitalWrite(pinG, HIGH);
   }
-  else if (digit == 3) {
+  else if (value == 3) {
     digitalWrite(pinB, HIGH);
     digitalWrite(pinC, HIGH);
     digitalWrite(pinF, HIGH);
     digitalWrite(pinG, HIGH);
   }
-  else if (digit == 4) {
+  else if (value == 4) {
     digitalWrite(pinA, HIGH);
     digitalWrite(pinC, HIGH);
     digitalWrite(pinD, HIGH);
     digitalWrite(pinF, HIGH);
     digitalWrite(pinG, HIGH);
   }
-  else if (digit == 5) {
+  else if (value == 5) {
     digitalWrite(pinA, HIGH);
     digitalWrite(pinC, HIGH);
     digitalWrite(pinD, HIGH);
     digitalWrite(pinF, HIGH);
     digitalWrite(pinG, HIGH);
   }
-  else if (digit == 6) {
+  else if (value == 6) {
     digitalWrite(pinA, HIGH);
     digitalWrite(pinC, HIGH);
     digitalWrite(pinD, HIGH);
@@ -138,13 +148,13 @@ void set_digit(int segment, int digit) {
     digitalWrite(pinF, HIGH);
     digitalWrite(pinG, HIGH);
   }
-  else if (digit == 7) {
+  else if (value == 7) {
     digitalWrite(pinA, HIGH);
     digitalWrite(pinB, HIGH);
     digitalWrite(pinC, HIGH);
     digitalWrite(pinF, HIGH);
   }
-  else if (digit == 8) {
+  else if (value == 8) {
     digitalWrite(pinA, HIGH);
     digitalWrite(pinB, HIGH);
     digitalWrite(pinC, HIGH);
@@ -153,7 +163,7 @@ void set_digit(int segment, int digit) {
     digitalWrite(pinF, HIGH);
     digitalWrite(pinG, HIGH);
   }
-  else if (digit == 9) {
+  else if (value == 9) {
     digitalWrite(pinA, HIGH);
     digitalWrite(pinB, HIGH);
     digitalWrite(pinC, HIGH);
@@ -162,6 +172,10 @@ void set_digit(int segment, int digit) {
     digitalWrite(pinG, HIGH);
   }
   delay(1);
+}
+
+void blink (int position, int value) {
+  
 }
 
 // the loop routine runs over and over again forever:
@@ -174,6 +188,7 @@ void loop() {
 
   if(enter) {    
     // Compare PINs
+
   }
   else if(x_current < low_threshold || x_current > high_threshold) {
     // Go back and forth depending on x
