@@ -1,5 +1,5 @@
-#include <Servo.h>
 
+#include <Servo.h>
 /*
   Showing number 0-9 on a Common Anode 7-segment LED display
   Displays the numbers 0-9 on the display, with one second inbetween.
@@ -41,10 +41,7 @@ const int high_threshold = 600;
 bool centered = true;
 
 // PIN
-int pin1 = 0;
-int pin2 = 0;
-int pin3 = 0;
-int pin4 = 0;
+int pin = 0;
 
 // 7 Segs
 int value1 = 0;
@@ -56,15 +53,12 @@ int current_position = 1;
 
 //Servo Motor
 //Servo pin declaration
-int servoPin = A3;
+int servoPin = A2;
 //Servo Object
 Servo Servo1; 
 
 // the setup routine runs once when you press reset:
 void setup() {
-
-  // Attach the servo to the used pin number 
-  Servo1.attach(servoPin); 
 
   // Set up joystick
   pinMode(SW_pin, INPUT);
@@ -83,6 +77,9 @@ void setup() {
   pinMode(D2, OUTPUT);
   pinMode(D3, OUTPUT);
   pinMode(D4, OUTPUT);
+
+  // Attach the servo to the used pin number 
+   Servo1.attach(servoPin); 
 }
 
 // Takes in which the seg to 
@@ -188,52 +185,26 @@ void set_digit(int position, int value) {
   delay(1);
 }
 
-// A blink is 1 on and off cycle
 void blink (int position, int value) {
-  delay(250);
-  set_digit(position, 0);
-  delay(250);
-  set_digit(position, value);
+  
 }
 
-// Checks if the pin on the display matches the correct pin stored and returns a boolean accordingly. 
-bool pass_fail () {
-  if (pin1 != value1) return false;
-  if (pin2 != value2) return false;
-  if (pin3 != value3) return false;
-  if (pin4 != value4) return false;
-  return true;
+void safe_open(){
+  //servo motor at 90 degrees 
+  Servo1.write(90); 
 }
 
-// Resets the display back to all 0. Resets current position back to 1. 
-void reset_display () {
-  value1 = 0;
-  value2 = 0;
-  value3 = 0;
-  value4 = 0;
-
-  set_digit(1, 0);
-  //set_digit()
-  current_position = 1;
-  blink(1, value1);
+void safe_close(){
+  //servo motor at 0 degrees
+  Servo1.write(0); 
 }
-
 // the loop routine runs over and over again forever:
 void loop() {
 
   delay(1000); // input delay 
   bool enter = ! digitalRead(SW_pin); // joystick button; true when pressed
   int x_current = digitalRead(X_pin); // (back) 0 -> 1023 (forward)
-  int y_current = digitalRead(Y_pin); // (increment) 0 -> 1023 (decrement)
-
-  set_digit(1, value1);
-  delay(1);
-  set_digit(2, value2);
-  delay(1);
-  set_digit(3, value3);
-  delay(1);
-  set_digit(4, value4);
-  delay(1);
+  int y_current = digitalRead(Y_pin; // (increment) 0 -> 1023 (decrement)
 
   if(enter) {    
     // Compare PINs
@@ -261,11 +232,11 @@ void loop() {
   Serial.println(y_current);
   Serial.print("\n\n");
 
-  //servo motor at 0 degrees
-  Servo1.write(0); 
-  delay(1000); 
+//  set_digit(1, 6);
+//  delay(1);
+//  set_digit(3, 0);
+//  delay(1);
 
-  //servo motor at 180 degrees
-  Servo1.write(180); 
-  delay(1000); 
+
+  
 }
