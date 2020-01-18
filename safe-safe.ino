@@ -188,9 +188,12 @@ void set_digit(int position, int value) {
   delay(1);
 }
 
-// A blink is 3 off and on cycles
+// A blink is 1 on and off cycle
 void blink (int position, int value) {
-
+  delay(250);
+  set_digit(position, 0);
+  delay(250);
+  set_digit(position, value);
 }
 
 // Checks if the pin on the display matches the correct pin stored and returns a boolean accordingly. 
@@ -202,11 +205,19 @@ bool pass_fail () {
   return true;
 }
 
+// Resets the display back to all 0. Resets current position back to 1. 
 void reset_display () {
+  value1 = 0;
+  value2 = 0;
+  value3 = 0;
+  value4 = 0;
+
   set_digit(1, 0);
-  set_digit()
+  set_digit(2, 0);
+  set_digit(3, 0);
+  set_digit(4, 0);
+
   current_position = 1;
-  blink(1, value1)
 }
 
 // the loop routine runs over and over again forever:
