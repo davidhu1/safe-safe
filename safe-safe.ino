@@ -1,8 +1,3 @@
-#include <boarddefs.h>
-#include <IRremote.h>
-#include <IRremoteInt.h>
-#include <ir_Lego_PF_BitStreamEncoder.h>
-
 /*
   Showing number 0-9 on a Common Anode 7-segment LED display
   Displays the numbers 0-9 on the display, with one second inbetween.
@@ -32,17 +27,25 @@ int D2 = 10;
 int D3 = 11;
 int D4 = 12;
 
+// Joystick
+const int SW_pin = 13;
+const int X_pin = 0;
+const int Y_pin = 1;
 
-const int RECV_PIN = 13;
-IRrecv irrecv(RECV_PIN);
-decode_results results;
+// Joystick tolerance
+const int low_threshold = 400;
+const int high_threshold = 600;
+
+// PIN
+int = 0;
 
 // the setup routine runs once when you press reset:
 void setup() {
-  
+
+  // Set up joystick
+  pinMode(SW_pin, INPUT);
+  digitalWrite(SW_pin, HIGH);
   Serial.begin(9600);
-  irrecv.enableIRIn();
-  irrecv.blink13(true);
 
   // initialize the digital pins as outputs.
   pinMode(pinA, OUTPUT);
@@ -164,11 +167,38 @@ void set_digit(int segment, int digit) {
 // the loop routine runs over and over again forever:
 void loop() {
 
-  if (irrecv.decode(&results)) {
-    Serial.println(results.value, HEX);
-    irrecv.resume();
+  delay(1000); // input delay 
+  bool enter = ! digitalRead(SW_pin); // joystick button; true when pressed
+  int x_current = digitalRead(X_pin); // (back) 0 -> 1023 (forward)
+  int y_current = digitalRead(Y_pin; // (increment) 0 -> 1023 (decrement)
+
+  if(enter) {    
+    // Compare PINs
   }
-  
-  set_digit(1, 6);
-  set_digit(3, 0);
+  else if(x_current < low_threshold || x_current > high_threshold) {
+    // Go back and forth depending on x
+    // x < low : go back
+    // x > high : go forward
+  }
+  else if(y_current < low_threshold || y_current > high_threshold) {
+    // Increment/decrement depending on y
+    // y < low : increment
+    // y > high : increment
+  }
+
+  // Prints for debugging :))
+  Serial.print("Switch:  ");
+  Serial.print(enter);
+  Serial.print("\n");
+  Serial.print("X-axis: ");
+  Serial.print(x_current);
+  Serial.print("\n");
+  Serial.print("Y-axis: ");
+  Serial.println(y_current);
+  Serial.print("\n\n");
+
+//  set_digit(1, 6);
+//  delay(1);
+//  set_digit(3, 0);
+//  delay(1);
 }
