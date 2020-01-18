@@ -56,7 +56,7 @@ int current_position = 1;
 
 //Servo Motor
 //Servo pin declaration
-int servoPin = A2;
+int servoPin = A3;
 //Servo Object
 Servo Servo1; 
 
@@ -213,11 +213,9 @@ void reset_display () {
   value4 = 0;
 
   set_digit(1, 0);
-  set_digit(2, 0);
-  set_digit(3, 0);
-  set_digit(4, 0);
-
+  //set_digit()
   current_position = 1;
+  blink(1, value1);
 }
 
 // the loop routine runs over and over again forever:
@@ -226,7 +224,16 @@ void loop() {
   delay(1000); // input delay 
   bool enter = ! digitalRead(SW_pin); // joystick button; true when pressed
   int x_current = digitalRead(X_pin); // (back) 0 -> 1023 (forward)
-  int y_current = digitalRead(Y_pin; // (increment) 0 -> 1023 (decrement)
+  int y_current = digitalRead(Y_pin); // (increment) 0 -> 1023 (decrement)
+
+  set_digit(1, value1);
+  delay(1);
+  set_digit(2, value2);
+  delay(1);
+  set_digit(3, value3);
+  delay(1);
+  set_digit(4, value4);
+  delay(1);
 
   if(enter) {    
     // Compare PINs
@@ -255,14 +262,10 @@ void loop() {
   Serial.print("\n\n");
 
   //servo motor at 0 degrees
-    Servo1.write(0); 
-    delay(1000); 
-
-  //servo motor at 90 degrees
-    Servo1.write(90); 
-    delay(1000); 
+  Servo1.write(0); 
+  delay(1000); 
 
   //servo motor at 180 degrees
-    Servo1.write(180); 
-    delay(1000); 
+  Servo1.write(180); 
+  delay(1000); 
 }
