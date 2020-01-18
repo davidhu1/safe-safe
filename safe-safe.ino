@@ -1,3 +1,5 @@
+
+#include <Servo.h>
 /*
   Showing number 0-9 on a Common Anode 7-segment LED display
   Displays the numbers 0-9 on the display, with one second inbetween.
@@ -49,6 +51,12 @@ int value4 = 0;
 
 int current_position = 1;
 
+//Servo Motor
+//Servo pin declaration
+int servoPin = A2;
+//Servo Object
+Servo Servo1; 
+
 // the setup routine runs once when you press reset:
 void setup() {
 
@@ -69,6 +77,9 @@ void setup() {
   pinMode(D2, OUTPUT);
   pinMode(D3, OUTPUT);
   pinMode(D4, OUTPUT);
+
+  // Attach the servo to the used pin number 
+   Servo1.attach(servoPin); 
 }
 
 // Takes in which the seg to 
@@ -216,4 +227,18 @@ void loop() {
 //  delay(1);
 //  set_digit(3, 0);
 //  delay(1);
+
+//servo motor at 0 degrees
+  Servo1.write(0); 
+  delay(1000); 
+
+//servo motor at 90 degrees
+  Servo1.write(90); 
+  delay(1000); 
+
+//servo motor at 180 degrees
+  Servo1.write(180); 
+  delay(1000); 
+
+  
 }
