@@ -85,7 +85,7 @@ void setup() {
   pinMode(D4, OUTPUT);
 }
 
-// Takes in which the seg to 
+// Table for Seven Seg display digits
 void set_digit(int position, int value) {
   //Initialize
   digitalWrite(D1, HIGH);
@@ -188,6 +188,113 @@ void set_digit(int position, int value) {
   delay(1);
 }
 
+// Displays the word "PASS" on the seven segment display for 1.5 seconds. 
+void display_pass() {
+  delay(1);
+  // Position 1
+  digitalWrite(D1, LOW);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, HIGH);
+  // "P"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinC, LOW);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
+  // Position 2
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, LOW);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, HIGH);
+  // "A"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinC, HIGH);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
+  // Position 3 & 4
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, LOW);
+  digitalWrite(D4, LOW);
+  // "S"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, LOW);
+  digitalWrite(pinC, HIGH);
+  digitalWrite(pinD, HIGH);
+  digitalWrite(pinE, LOW);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
+}
+
+void display_fail() {
+  delay(1);
+  // Position 1
+  digitalWrite(D1, LOW);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, HIGH);
+  // "F"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, LOW);
+  digitalWrite(pinC, LOW);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
+  // Position 2
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, LOW);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, HIGH);
+  // "A"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinC, HIGH);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
+  // Position 3
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, LOW);
+  digitalWrite(D4, HIGH);
+  // "I"
+  digitalWrite(pinA, LOW);
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinC, HIGH);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, LOW);
+  digitalWrite(pinF, LOW);
+  digitalWrite(pinG, LOW);
+  delay(1);
+  // Position 4
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, LOW);
+  // "L"
+  digitalWrite(pinA, LOW);
+  digitalWrite(pinB, LOW);
+  digitalWrite(pinC, LOW);
+  digitalWrite(pinD, HIGH);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, LOW);
+}
+
+
 // A blink is 1 on and off cycle
 void blink (int position, int value) {
   delay(250);
@@ -213,9 +320,11 @@ void reset_display () {
   value4 = 0;
 
   set_digit(1, 0);
-  //set_digit()
+  set_digit(2, 0);
+  set_digit(3, 0);
+  set_digit(4, 0);
+
   current_position = 1;
-  blink(1, value1);
 }
 
 // the loop routine runs over and over again forever:
