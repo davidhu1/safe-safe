@@ -41,7 +41,10 @@ const int high_threshold = 600;
 bool centered = true;
 
 // PIN
-int pin = 0;
+int pin1 = 0;
+int pin2 = 0;
+int pin3 = 0;
+int pin4 = 0;
 
 // 7 Segs
 int value1 = 0;
@@ -185,20 +188,155 @@ void set_digit(int position, int value) {
   delay(1);
 }
 
-void blink (int position, int value) {
-  
+// Displays the word "PASS" on the seven segment display for 1.5 seconds. 
+void display_pass() {
+  delay(1);
+  // Position 1
+  digitalWrite(D1, LOW);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, HIGH);
+  // "P"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinC, LOW);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
+  // Position 2
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, LOW);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, HIGH);
+  // "A"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinC, HIGH);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
+  // Position 3 & 4
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, LOW);
+  digitalWrite(D4, LOW);
+  // "S"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, LOW);
+  digitalWrite(pinC, HIGH);
+  digitalWrite(pinD, HIGH);
+  digitalWrite(pinE, LOW);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
 }
 
-void safe_open(){
+void display_fail() {
+  delay(1);
+  // Position 1
+  digitalWrite(D1, LOW);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, HIGH);
+  // "F"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, LOW);
+  digitalWrite(pinC, LOW);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
+  // Position 2
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, LOW);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, HIGH);
+  // "A"
+  digitalWrite(pinA, HIGH);
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinC, HIGH);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, HIGH);
+  delay(1);
+  // Position 3
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, LOW);
+  digitalWrite(D4, HIGH);
+  // "I"
+  digitalWrite(pinA, LOW);
+  digitalWrite(pinB, HIGH);
+  digitalWrite(pinC, HIGH);
+  digitalWrite(pinD, LOW);
+  digitalWrite(pinE, LOW);
+  digitalWrite(pinF, LOW);
+  digitalWrite(pinG, LOW);
+  delay(1);
+  // Position 4
+  digitalWrite(D1, HIGH);
+  digitalWrite(D2, HIGH);
+  digitalWrite(D3, HIGH);
+  digitalWrite(D4, LOW);
+  // "L"
+  digitalWrite(pinA, LOW);
+  digitalWrite(pinB, LOW);
+  digitalWrite(pinC, LOW);
+  digitalWrite(pinD, HIGH);
+  digitalWrite(pinE, HIGH);
+  digitalWrite(pinF, HIGH);
+  digitalWrite(pinG, LOW);
+}
+
+// A blink is 1 on and off cycle
+void blink (int position, int value) {
+  delay(250);
+  set_digit(position, 0);
+  delay(250);
+  set_digit(position, value);
+}
+
+// Checks if the pin on the display matches the correct pin stored and returns a boolean accordingly. 
+bool pass_fail () {
+  if (pin1 != value1) return false;
+  if (pin2 != value2) return false;
+  if (pin3 != value3) return false;
+  if (pin4 != value4) return false;
+  return true;
+}
+
+// Resets the display back to all 0. Resets current position back to 1. 
+void reset_display () {
+  value1 = 0;
+  value2 = 0;
+  value3 = 0;
+  value4 = 0;
+
+  set_digit(1, 0);
+  set_digit(2, 0);
+  set_digit(3, 0);
+  set_digit(4, 0);
+
+  current_position = 1;
+}
+
+void open_safe(){
   //servo motor at 90 degrees 
   Servo1.write(90); 
 }
 
 
-void safe_close(){
+void close_safe(){
   //servo motor at 0 degrees
   Servo1.write(0); 
 }
+
 // the loop routine runs over and over again forever:
 void loop() {
 
