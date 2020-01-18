@@ -280,7 +280,10 @@ const int high_threshold = 600;
 bool centered = true;
 
 // PIN
-int pin = 0;
+int pin1 = 0;
+int pin2 = 0;
+int pin3 = 0;
+int pin4 = 0;
 
 // 7 Segs
 int value1 = 0;
