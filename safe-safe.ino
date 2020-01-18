@@ -1,5 +1,6 @@
-
 #include <Servo.h>
+
+
 /*
   Showing number 0-9 on a Common Anode 7-segment LED display
   Displays the numbers 0-9 on the display, with one second inbetween.
@@ -33,26 +34,27 @@ int D4 = 12;
 const int SW_pin = 13;
 const int X_pin = 0;
 const int Y_pin = 1;
+bool waiting_on_center = false;
 
 // Joystick tolerance
 const int low_threshold = 400;
 const int high_threshold = 600;
 
-bool centered = true;
-
 // PIN
+int pin [4] = {0, 0, 0, 0};
 int pin1 = 0;
 int pin2 = 0;
 int pin3 = 0;
 int pin4 = 0;
 
-// 7 Segs
+// 7 Seg digits
+int values [4] = {0, 0, 0, 0};
 int value1 = 0;
 int value2 = 0;
 int value3 = 0;
 int value4 = 0;
 
-int current_position = 1;
+int current_position = 0;
 
 //Servo Motor
 //Servo pin declaration
@@ -60,7 +62,7 @@ int servoPin = A2;
 //Servo Object
 Servo Servo1; 
 
-// the setup routine runs once when you press reset:
+// Setup routine
 void setup() {
 
   // Set up joystick
@@ -82,7 +84,7 @@ void setup() {
   pinMode(D4, OUTPUT);
 
   // Attach the servo to the used pin number 
-   Servo1.attach(servoPin); 
+  Servo1.attach(servoPin); 
 }
 
 // Table for Seven Seg display digits
@@ -102,16 +104,16 @@ void set_digit(int position, int value) {
   digitalWrite(pinF, LOW);
   digitalWrite(pinG, LOW);
   
-  if (position == 1) {
+  if (position == 0) {
     digitalWrite(D1, LOW);
   }
-  else if (position == 2) {
+  else if (position == 1) {
     digitalWrite(D2, LOW);
   }
-  else if (position == 3) {
+  else if (position == 2) {
     digitalWrite(D3, LOW);
   }
-  else if (position == 4) {
+  else if (position == 3) {
     digitalWrite(D4, LOW);
   }
 
@@ -135,15 +137,15 @@ void set_digit(int position, int value) {
     digitalWrite(pinG, HIGH);
   }
   else if (value == 3) {
+    digitalWrite(pinA, HIGH);
     digitalWrite(pinB, HIGH);
     digitalWrite(pinC, HIGH);
-    digitalWrite(pinF, HIGH);
+    digitalWrite(pinD, HIGH);
     digitalWrite(pinG, HIGH);
   }
   else if (value == 4) {
-    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
     digitalWrite(pinC, HIGH);
-    digitalWrite(pinD, HIGH);
     digitalWrite(pinF, HIGH);
     digitalWrite(pinG, HIGH);
   }
@@ -188,7 +190,7 @@ void set_digit(int position, int value) {
   delay(1);
 }
 
-// Displays the word "PASS" on the seven segment display for 1.5 seconds. 
+// Displays the word "PASS" on the seven segment display for 0.5 seconds
 void display_pass() {
   delay(1);
   // Position 1
@@ -232,9 +234,10 @@ void display_pass() {
   digitalWrite(pinE, LOW);
   digitalWrite(pinF, HIGH);
   digitalWrite(pinG, HIGH);
-  delay(1);
+  delay(500);
 }
 
+// Displays the word "FAIL" on the seven segment display for 0.5 seconds
 void display_fail() {
   delay(1);
   // Position 1
@@ -292,6 +295,7 @@ void display_fail() {
   digitalWrite(pinE, HIGH);
   digitalWrite(pinF, HIGH);
   digitalWrite(pinG, LOW);
+  delay(500);
 }
 
 // A blink is 1 on and off cycle
@@ -304,26 +308,27 @@ void blink (int position, int value) {
 
 // Checks if the pin on the display matches the correct pin stored and returns a boolean accordingly. 
 bool pass_fail () {
-  if (pin1 != value1) return false;
-  if (pin2 != value2) return false;
-  if (pin3 != value3) return false;
-  if (pin4 != value4) return false;
+  for (int i=0; i < 4; i++) {
+    if (pin[i] != values[i]) {
+      return false;
+    }
+  }
   return true;
 }
 
 // Resets the display back to all 0. Resets current position back to 1. 
 void reset_display () {
-  value1 = 0;
-  value2 = 0;
-  value3 = 0;
-  value4 = 0;
+  values[0] = 0;
+  values[1] = 0;
+  values[2] = 0;
+  values[3] = 0;
 
   set_digit(1, 0);
   set_digit(2, 0);
   set_digit(3, 0);
   set_digit(4, 0);
 
-  current_position = 1;
+  current_position = 0;
 }
 
 void open_safe(){
@@ -340,24 +345,66 @@ void close_safe(){
 // the loop routine runs over and over again forever:
 void loop() {
 
-  delay(1000); // input delay 
+  delay(10); // input delay 
+
+  // Read from joystick
   bool enter = ! digitalRead(SW_pin); // joystick button; true when pressed
-  int x_current = digitalRead(X_pin); // (back) 0 -> 1023 (forward)
-  int y_current = digitalRead(Y_pin; // (increment) 0 -> 1023 (decrement)
+  int x_current = analogRead(X_pin); // (back) 0 -> 1023 (forward)
+  int y_current = analogRead(Y_pin); // (increment) 0 -> 1023 (decrement)
 
-  if(enter) {    
-    // Compare PINs
+  if(!waiting_on_center) {
+    if(enter) {    
+      // Compare PINs
+      
+    }
+    else if(x_current < low_threshold || x_current > high_threshold) {
+      // Go back and forth depending on x
+      // x < low : go back
+      // x > high : go forward
 
+      // Go back one digit
+      if (x_current < low_threshold && current_position != 0) {
+        current_position--;
+
+      }
+      // Go forward one digit
+      else if(current_position != 3) {
+        current_position++;
+
+      }
+      waiting_on_center = true;
+    }
+    else if(y_current < low_threshold || y_current > high_threshold) {
+      // Increment/decrement depending on y
+      // y < low : increment
+      // y > high : increment
+
+      // Increment value
+      if(y_current < low_threshold) {
+        if(values[current_position] == 9) {
+          values[current_position] = 0;
+        }
+        else {
+          values[current_position]++;
+        }
+      }
+      // Decrement value
+      else {
+        if(values[current_position] == 0) {
+          values[current_position] = 9;
+        }
+        else {
+          values[current_position]--;
+        }
+      }
+      set_digit(current_position, values[current_position]);
+      waiting_on_center = true;
+    }
   }
-  else if(x_current < low_threshold || x_current > high_threshold) {
-    // Go back and forth depending on x
-    // x < low : go back
-    // x > high : go forward
-  }
-  else if(y_current < low_threshold || y_current > high_threshold) {
-    // Increment/decrement depending on y
-    // y < low : increment
-    // y > high : increment
+  else {
+    if(x_current > low_threshold && x_current < high_threshold && y_current > low_threshold && y_current < high_threshold) {
+      waiting_on_center = false;
+    }
   }
 
   // Prints for debugging :))
