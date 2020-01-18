@@ -39,7 +39,10 @@ const int high_threshold = 600;
 bool centered = true;
 
 // PIN
-int pin = 0;
+int pin1 = 0;
+int pin2 = 0;
+int pin3 = 0;
+int pin4 = 0;
 
 // 7 Segs
 int value1 = 0;
@@ -174,8 +177,25 @@ void set_digit(int position, int value) {
   delay(1);
 }
 
+// A blink is 3 off and on cycles
 void blink (int position, int value) {
-  
+
+}
+
+// Checks if the pin on the display matches the correct pin stored and returns a boolean accordingly. 
+bool pass_fail () {
+  if (pin1 != value1) return false;
+  if (pin2 != value2) return false;
+  if (pin3 != value3) return false;
+  if (pin4 != value4) return false;
+  return true;
+}
+
+void reset_display () {
+  set_digit(1, 0);
+  set_digit()
+  current_position = 1;
+  blink(1, value1)
 }
 
 // the loop routine runs over and over again forever:
