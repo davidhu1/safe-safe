@@ -13,13 +13,13 @@ int D2 = 10;
 int D3 = 11;
 int D4 = 12;
 
-// Joystick
+// Joystick 
 const int SW_pin = 13;
 const int X_pin = 0;
 const int Y_pin = 1;
 bool waiting_on_center = false;
 
-// Joystick tolerance
+// Joystick tolerance (it gives values from 0 - 1024)
 const int low_threshold = 400;
 const int high_threshold = 600;
 
@@ -29,15 +29,60 @@ int pin [4] = {1, 5, 2, 1};
 // 7 Seg digits
 int values [4] = {0, 0, 0, 0};
 
+// Position of current digit of display that we can adjust.
 int current_position = 0;
 
-//Servo Motor
-//Servo pin declaration
+// Servo Motor
+// Servo pin declaration
 int servoPin = A3;
-//Servo Object
+// Servo Object
 Servo Servo1; 
 
+// Boolean to keep track of the state of the servo motor with the door.
 bool locked = true;
+
+/**
+ * @author David Hu
+ * Turns the seven segment display on and off with a 250 ms delay to similate a "blink".
+ */
+void blink (int position, int value) {
+  delay(250);
+  set_digit(position, 0);
+  delay(250);
+  set_digit(position, value);
+}
+
+/**
+ * @author David Hu
+ * Checks if the pin on the display matches the correct pin stored.
+ * @return true if pin is correct, otherwise false. 
+ */
+bool pass_fail () {
+  for (int i=0; i < 4; i++) {
+    if (pin[i] != values[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * @author David Hu
+ * Resets the display back to all 0. Resets current position back to 1. 
+ */
+void reset_display () {
+  values[0] = 0;
+  values[1] = 0;
+  values[2] = 0;
+  values[3] = 0;
+
+  set_digit(1, 0);
+  set_digit(2, 0);
+  set_digit(3, 0);
+  set_digit(4, 0);
+
+  current_position = 0;
+}
 
 // Setup routine
 void setup() {
@@ -64,7 +109,150 @@ void setup() {
   Servo1.attach(servoPin); 
 }
 
-// Look Up Table for Seven Seg display digits
+/**
+ * @author Serena He
+ * Loops on Arduino infinitely, checking for joystick inputs.
+ */
+void loop() {
+  // Read from joystick
+  bool enter = ! digitalRead(SW_pin); // joystick button; true when pressed
+  int x_current = analogRead(X_pin); // (back) 0 -> 1023 (forward)
+  int y_current = analogRead(Y_pin); // (increment) 0 -> 1023 (decrement)
+
+  // Joystick must return to center position after each movements
+  if(!waiting_on_center) {
+    if(enter) {
+      /*
+        Joystick pressed to open/close safe
+      */
+      // Safe is currently open
+      if(!locked) {
+        close_safe();
+        locked = true;
+        delay(10);
+      }  
+      // PIN match
+      else if(pass_fail()) {
+        display_pass(); 
+        reset_display();
+        open_safe();
+        locked = false;
+        delay(10);
+      }
+      // PIN mismatch
+      else {
+        flash_display();
+      }
+    }
+    else if(x_current < low_threshold || x_current > high_threshold) {
+      /* 
+        Go back and forth between digits
+        x < low : go back
+        x > high : go forward
+      */
+
+      // Go back one digit
+      if (x_current < low_threshold && current_position != 0) {
+        current_position--;
+      }
+      // Go forward one digit
+      else if(current_position != 3) {
+        current_position++;
+      }
+      waiting_on_center = true;
+    }
+    else if(y_current < low_threshold || y_current > high_threshold) {
+      /* 
+        Increment/decrement digit display
+        y < low : increment
+        y > high : increment
+      */
+
+      // Increment value
+      if(y_current < low_threshold) {
+        if(values[current_position] == 9) {
+          values[current_position] = 0;
+        }
+        else {
+          values[current_position]++;
+        }
+      }
+      // Decrement value
+      else {
+        if(values[current_position] == 0) {
+          values[current_position] = 9;
+        }
+        else {
+          values[current_position]--;
+        }
+      }
+      set_digit(current_position, values[current_position]);
+      waiting_on_center = true;
+    }
+  }
+  else {
+    // Check if joystick has been recentered
+    if(x_current > low_threshold && x_current < high_threshold && y_current > low_threshold && y_current < high_threshold) {
+      waiting_on_center = false;
+    }
+  }
+  // Update values of display
+  for (int i=0; i < 4; i++) {
+    set_digit(i, values[i]);
+  }
+}
+
+/**
+ * @author Serena He
+ * Flashes display on and off rapidly.
+*/
+void flash_display() {
+  for (int i=0; i < 3; i++) {
+    for (int dig=0; dig < 4; dig++) {
+      (i % 2 == 0) ? set_digit(dig, -1) : set_digit(dig, values[dig]);
+    }
+    delay(100);
+  }
+}
+
+void open_safe(){
+  //servo motor at 90 degrees 
+  Servo1.write(90); 
+}
+
+void close_safe(){
+  //servo motor at 0 degrees
+  Servo1.write(0); 
+}
+
+/**
+ * @author Serena He
+ * Check if SW_pin is being held down; returns true for a hold of more than 2 seconds.
+ * @return if enter is held longer than 2 seconds
+*/
+bool is_enter_held() {
+  bool enter_held = true;
+
+  for(int i=0; i < 20; i++) {
+    delay(100);
+    enter_held = ! digitalRead(SW_pin);
+    if (!enter_held) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void reset_pin() {
+  for(int i=0; i < 4; i++) {
+    pin[i] = values[i];
+  }
+}
+
+/**
+ * @author David Hu
+ * Look Up Table for the Seven Segment Display digits
+ */
 void set_digit(int place, int value) {
   // Write to the appropriate position:
   if (place == 0) {
@@ -194,8 +382,10 @@ void set_digit(int place, int value) {
   delay(1);
 }
 
-
-// Displays the word "PASS" on the seven segment display for 0.5 seconds
+/**
+ * @author David Hu 
+ * Displays the word "PASS" on the seven segment display for 0.5 seconds
+ */
 void display_pass() {
   for(int i=0; i < 175; i++) {
     delay(1);
@@ -244,7 +434,10 @@ void display_pass() {
   }
 }
 
-// Displays the word "FAIL" on the seven segment display for 0.5 seconds
+/**
+ * @author David Hu
+ * Displays the word "FAIL" on the seven segment display for 0.5 seconds
+ */
 void display_fail() {
   for(int i=0; i < 175; i++) {
     delay(1);
@@ -307,179 +500,5 @@ void display_fail() {
     digitalWrite(pinF, HIGH);
     digitalWrite(pinG, LOW);
     delay(1);
-  }
-}
-
-// A blink is 1 on and off cycle
-void blink (int position, int value) {
-  delay(250);
-  set_digit(position, 0);
-  delay(250);
-  set_digit(position, value);
-}
-
-/**
- * @author Serena He
- * Flashes display on and off rapidly.
-*/
-void flash_display() {
-  for (int i=0; i < 3; i++) {
-    for (int dig=0; dig < 4; dig++) {
-      (i % 2 == 0) ? set_digit(dig, -1) : set_digit(dig, values[dig]);
-    }
-    delay(100);
-  }
-}
-
-// Checks if the pin on the display matches the correct pin stored and returns a boolean accordingly. 
-bool pass_fail () {
-  for (int i=0; i < 4; i++) {
-    if (pin[i] != values[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
-// Resets the display back to all 0. Resets current position back to 1. 
-void reset_display () {
-  values[0] = 0;
-  values[1] = 0;
-  values[2] = 0;
-  values[3] = 0;
-
-  set_digit(1, 0);
-  set_digit(2, 0);
-  set_digit(3, 0);
-  set_digit(4, 0);
-
-  current_position = 0;
-}
-
-void open_safe(){
-  //servo motor at 90 degrees 
-  Servo1.write(90); 
-}
-
-
-void close_safe(){
-  //servo motor at 0 degrees
-  Servo1.write(0); 
-}
-
-/**
- * @author Serena He
- * Check if SW_pin is being held down; returns true for a hold of more than 2 seconds.
- * @return if enter is held longer than 2 seconds
-*/
-bool is_enter_held() {
-  bool enter_held = true;
-
-  for(int i=0; i < 20; i++) {
-    delay(100);
-    enter_held = ! digitalRead(SW_pin);
-    if (!enter_held) {
-      return false;
-    }
-  }
-  return true;
-}
-
-void reset_pin() {
-  for(int i=0; i < 4; i++) {
-    pin[i] = values[i];
-  }
-}
-
-/**
- * @author Serena He
- * Loops on Arduino infinitely, checking for joystick inputs.
- */
-void loop() {
-  // Read from joystick
-  bool enter = ! digitalRead(SW_pin); // joystick button; true when pressed
-  int x_current = analogRead(X_pin); // (back) 0 -> 1023 (forward)
-  int y_current = analogRead(Y_pin); // (increment) 0 -> 1023 (decrement)
-
-  // Joystick must return to center position after each movements
-  if(!waiting_on_center) {
-    if(enter) {
-      /*
-        Joystick pressed to open/close safe
-      */
-      // Safe is currently open
-      if(!locked) {
-        close_safe();
-        locked = true;
-        delay(10);
-      }  
-      // PIN match
-      else if(pass_fail()) {
-        display_pass(); 
-        reset_display();
-        open_safe();
-        locked = false;
-        delay(10);
-      }
-      // PIN mismatch
-      else {
-        flash_display();
-      }
-    }
-    else if(x_current < low_threshold || x_current > high_threshold) {
-      /* 
-        Go back and forth between digits
-        x < low : go back
-        x > high : go forward
-      */
-
-      // Go back one digit
-      if (x_current < low_threshold && current_position != 0) {
-        current_position--;
-      }
-      // Go forward one digit
-      else if(current_position != 3) {
-        current_position++;
-      }
-      waiting_on_center = true;
-    }
-    else if(y_current < low_threshold || y_current > high_threshold) {
-      /* 
-        Increment/decrement digit display
-        y < low : increment
-        y > high : increment
-      */
-
-      // Increment value
-      if(y_current < low_threshold) {
-        if(values[current_position] == 9) {
-          values[current_position] = 0;
-        }
-        else {
-          values[current_position]++;
-        }
-      }
-      // Decrement value
-      else {
-        if(values[current_position] == 0) {
-          values[current_position] = 9;
-        }
-        else {
-          values[current_position]--;
-        }
-      }
-      set_digit(current_position, values[current_position]);
-      waiting_on_center = true;
-    }
-  }
-  else {
-    // Check if joystick has been recentered
-    if(x_current > low_threshold && x_current < high_threshold && y_current > low_threshold && y_current < high_threshold) {
-      waiting_on_center = false;
-    }
-  }
-  // Update values of display
-  for (int i=0; i < 4; i++) {
-    set_digit(i, values[i]);
   }
 }
