@@ -25,26 +25,20 @@ const int low_threshold = 400;
 const int high_threshold = 600;
 
 // PIN
-int pin [4] = {0, 0, 0, 0};
-int pin1 = 0;
-int pin2 = 0;
-int pin3 = 0;
-int pin4 = 0;
+int pin [4] = {1, 2, 3, 4};
 
 // 7 Seg digits
 int values [4] = {0, 0, 0, 0};
-int value1 = 0;
-int value2 = 0;
-int value3 = 0;
-int value4 = 0;
 
 int current_position = 0;
 
 //Servo Motor
 //Servo pin declaration
-int servoPin = A2;
+int servoPin = A3;
 //Servo Object
 Servo Servo1; 
+
+bool locked = true;
 
 // Setup routine
 void setup() {
@@ -69,6 +63,243 @@ void setup() {
 
   // Attach the servo to the used pin number 
   Servo1.attach(servoPin); 
+}
+
+// Look Up Table for Seven Seg display digits
+void set_digit(int place, int value) {
+  // Write to the appropriate position:
+  if (place == 0) {
+    digitalWrite(D1, LOW);
+    digitalWrite(D2, HIGH);
+    digitalWrite(D3, HIGH);
+    digitalWrite(D4, HIGH);
+  }
+  else if (place == 1) {
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, LOW);
+    digitalWrite(D3, HIGH);
+    digitalWrite(D4, HIGH);
+  }
+  else if (place == 2) {
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, HIGH);
+    digitalWrite(D3, LOW);
+    digitalWrite(D4, HIGH);
+  }
+  else if (place == 3) {
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, HIGH);    
+    digitalWrite(D3, HIGH);
+    digitalWrite(D4, LOW);
+  }
+
+  if (value == 0) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, LOW);
+  }
+  else if (value == 1) {
+    digitalWrite(pinA, LOW);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, LOW);
+    digitalWrite(pinE, LOW);
+    digitalWrite(pinF, LOW);
+    digitalWrite(pinG, LOW);
+  }
+  else if (value == 2) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, LOW);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, LOW);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (value == 3) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, LOW);
+    digitalWrite(pinF, LOW);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (value == 4) {
+    digitalWrite(pinA, LOW);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, LOW);
+    digitalWrite(pinE, LOW);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (value == 5) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, LOW);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, LOW);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (value == 6) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, LOW);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (value == 7) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, LOW);
+    digitalWrite(pinE, LOW);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, LOW);
+  }
+  else if (value == 8) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  else if (value == 9) {
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, LOW);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+  }
+  delay(1);
+}
+
+
+// Displays the word "PASS" on the seven segment display for 0.5 seconds
+void display_pass() {
+  for(int i=0; i < 175; i++) {
+    delay(1);
+    // Position 1
+    digitalWrite(D1, LOW);
+    digitalWrite(D2, HIGH);
+    digitalWrite(D3, HIGH);
+    digitalWrite(D4, HIGH);
+    // "P"
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, LOW);
+    digitalWrite(pinD, LOW);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+    delay(1);
+    // Position 2
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, LOW);
+    digitalWrite(D3, HIGH);
+    digitalWrite(D4, HIGH);
+    // "A"
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, LOW);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+    delay(1);
+    // Position 3 & 4
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, HIGH);
+    digitalWrite(D3, LOW);
+    digitalWrite(D4, LOW);
+    // "S"
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, LOW);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, LOW);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+    delay(1);
+  }
+}
+
+// Displays the word "FAIL" on the seven segment display for 0.5 seconds
+void display_fail() {
+  for(int i=0; i < 175; i++) {
+    delay(1);
+    // Position 1
+    digitalWrite(D1, LOW);
+    digitalWrite(D2, HIGH);
+    digitalWrite(D3, HIGH);
+    digitalWrite(D4, HIGH);
+    // "F"
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, LOW);
+    digitalWrite(pinC, LOW);
+    digitalWrite(pinD, LOW);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+    delay(1);
+
+    // Position 2
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, LOW);
+    digitalWrite(D3, HIGH);
+    digitalWrite(D4, HIGH);
+    // "A"
+    digitalWrite(pinA, HIGH);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, LOW);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, HIGH);
+    delay(1);
+
+    // Position 3
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, HIGH);
+    digitalWrite(D3, LOW);
+    digitalWrite(D4, HIGH);
+    // "I"
+    digitalWrite(pinA, LOW);
+    digitalWrite(pinB, HIGH);
+    digitalWrite(pinC, HIGH);
+    digitalWrite(pinD, LOW);
+    digitalWrite(pinE, LOW);
+    digitalWrite(pinF, LOW);
+    digitalWrite(pinG, LOW);
+    delay(1);
+
+    // Position 4
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, HIGH);
+    digitalWrite(D3, HIGH);
+    digitalWrite(D4, LOW);
+    // "L"
+    digitalWrite(pinA, LOW);
+    digitalWrite(pinB, LOW);
+    digitalWrite(pinC, LOW);
+    digitalWrite(pinD, HIGH);
+    digitalWrite(pinE, HIGH);
+    digitalWrite(pinF, HIGH);
+    digitalWrite(pinG, LOW);
+    delay(1);
+  }
 }
 
 // A blink is 1 on and off cycle
@@ -118,7 +349,7 @@ void close_safe(){
 // the loop routine runs over and over again forever:
 void loop() {
 
-  delay(10); // input delay 
+  delay(1); // input delay 
 
   // Read from joystick
   bool enter = ! digitalRead(SW_pin); // joystick button; true when pressed
@@ -126,9 +357,22 @@ void loop() {
   int y_current = analogRead(Y_pin); // (increment) 0 -> 1023 (decrement)
 
   if(!waiting_on_center) {
-    if(enter) {    
-      // Compare PINs
-      
+    if(enter) {  
+      if(!locked) {
+        close_safe();
+        locked = true;
+      }  
+      // PIN match
+      else if(pass_fail()) {
+        display_pass(); 
+        reset_display();
+        open_safe();
+        locked = false;
+      }
+      // PIN mismatch
+      else {
+        display_fail();
+      }
     }
     else if(x_current < low_threshold || x_current > high_threshold) {
       // Go back and forth depending on x
@@ -138,12 +382,10 @@ void loop() {
       // Go back one digit
       if (x_current < low_threshold && current_position != 0) {
         current_position--;
-
       }
       // Go forward one digit
       else if(current_position != 3) {
         current_position++;
-
       }
       waiting_on_center = true;
     }
@@ -180,22 +422,7 @@ void loop() {
     }
   }
 
-  // Prints for debugging :))
-  Serial.print("Switch:  ");
-  Serial.print(enter);
-  Serial.print("\n");
-  Serial.print("X-axis: ");
-  Serial.print(x_current);
-  Serial.print("\n");
-  Serial.print("Y-axis: ");
-  Serial.println(y_current);
-  Serial.print("\n\n");
-
-//  set_digit(1, 6);
-//  delay(1);
-//  set_digit(3, 0);
-//  delay(1);
-
-
-  
+  for (int i=0; i < 4; i++) {
+    set_digit(i, values[i]);
+  }
 }
